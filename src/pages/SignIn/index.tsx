@@ -14,13 +14,18 @@ import { AuthContext } from "../../context/AuthContext";
 
 import logo from "../../assets/logo.svg";
 
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { signIn } = useContext(AuthContext);
 
   const handleSubmit = useCallback(
-    async (data: object) => {
+    async (data: SignInFormData) => {
       try {
         const schema = Yup.object().shape({
           email: Yup.string()
@@ -33,7 +38,7 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        signIn();
+        signIn({ email: data.email, password: data.password });
       } catch (error) {
         console.log(error);
         const errors = getValidationErrors(error);
