@@ -10,7 +10,8 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { getValidationErrors } from "../../utils/getValidationErrors";
 
-import { useAuth } from "../../hooks/AuthContext";
+import { useToast } from "../../hooks/toast";
+import { useAuth } from "../../hooks/auth";
 
 import logo from "../../assets/logo.svg";
 
@@ -23,6 +24,7 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { user, signIn } = useAuth();
+  const { removeToast, addToast } = useToast();
 
   console.log(user);
 
@@ -40,11 +42,15 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        signIn({ email: data.email, password: data.password });
+        await signIn({ email: data.email, password: data.password });
       } catch (error) {
-        console.log(error);
-        const errors = getValidationErrors(error);
-        formRef.current?.setErrors(errors);
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+          formRef.current?.setErrors(errors);
+        }
+
+        //disparar toast
+        addToast();
       }
     },
     [signIn]

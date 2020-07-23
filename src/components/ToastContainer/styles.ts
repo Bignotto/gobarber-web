@@ -2,10 +2,16 @@ import styled, { css } from "styled-components";
 
 interface ToastProps {
   type?: "success" | "error" | "info";
-  hadDescription: boolean;
+  hasDescription: boolean;
 }
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 30px;
+  overflow: hidden;
+`;
 
 const toastTypeVariations = {
   info: css`
@@ -32,5 +38,42 @@ export const Toast = styled.div<ToastProps>`
 
   display: flex;
 
+  & + div {
+    margin-top: 8px;
+  }
+
   ${props => toastTypeVariations[props.type || "info"]}
+
+  > svg {
+    margin: 4px 12px 0 0;
+  }
+
+  div {
+    flex: 1;
+    p {
+      margin-top: 4px;
+      font-size: 14px;
+      opacity: 0.8;
+      line-height: 20px;
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 16px;
+    top: 20px;
+    opacity: 0.6;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+
+  ${props =>
+    !props.hasDescription &&
+    css`
+      align-items: center;
+      svg {
+        margin-top: 0;
+      }
+    `}
 `;
