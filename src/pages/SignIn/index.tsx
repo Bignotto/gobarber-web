@@ -50,7 +50,11 @@ const SignIn: React.FC = () => {
         }
 
         //disparar toast
-        addToast();
+        addToast({
+          type: "error",
+          title: "Erro na autenticação",
+          description: "Verifique seu usuário e senha e tente novamente.",
+        });
       }
     },
     [signIn]
