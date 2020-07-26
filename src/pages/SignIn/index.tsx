@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 import { Container, Content, Background, AnimationContainer } from "./styles";
 
@@ -26,6 +26,7 @@ const SignIn: React.FC = () => {
 
   const { user, signIn } = useAuth();
   const { removeToast, addToast } = useToast();
+  const history = useHistory();
 
   console.log(user);
 
@@ -44,6 +45,8 @@ const SignIn: React.FC = () => {
         });
 
         await signIn({ email: data.email, password: data.password });
+
+        history.push("/dashboard");
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -58,7 +61,7 @@ const SignIn: React.FC = () => {
         });
       }
     },
-    [signIn]
+    [signIn, addToast, history]
   );
 
   return (
