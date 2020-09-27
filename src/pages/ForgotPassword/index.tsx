@@ -16,37 +16,30 @@ import { useAuth } from "../../hooks/auth";
 
 import logo from "../../assets/logo.svg";
 
-interface SignInFormData {
+interface ForgotPasswordFormData {
   email: string;
-  password: string;
 }
 
-const SignIn: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { user, signIn } = useAuth();
   const { removeToast, addToast } = useToast();
   const history = useHistory();
 
-  console.log(user);
-
   const handleSubmit = useCallback(
-    async (data: SignInFormData) => {
+    async (data: ForgotPasswordFormData) => {
       try {
         const schema = Yup.object().shape({
           email: Yup.string()
             .required("E-Mail é obrigatório!")
             .email("Informe um e-mail válido."),
-          password: Yup.string().min(6, "Senha precisa ter 6 dígitos."),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await signIn({ email: data.email, password: data.password });
-
-        history.push("/dashboard");
+        // history.push("/dashboard");
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -56,12 +49,13 @@ const SignIn: React.FC = () => {
         //disparar toast
         addToast({
           type: "error",
-          title: "Erro na autenticação",
-          description: "Verifique seu usuário e senha e tente novamente.",
+          title: "Erro na recuperação de senha",
+          description:
+            "Ocorreu um erro ao tentar recuperar a senha. Tente novamente.",
         });
       }
     },
-    [signIn, addToast, history]
+    [addToast]
   );
 
   return (
@@ -70,26 +64,19 @@ const SignIn: React.FC = () => {
         <AnimationContainer>
           <img src={logo} alt="LOGO" />
           <Form ref={formRef} onSubmit={handleSubmit}>
-            <h1>Faça seu logon</h1>
+            <h1>Recuperar Senha</h1>
             <Input
               name="email"
               icon={FiMail}
               type="email"
               placeholder="E-Mail"
             />
-            <Input
-              name="password"
-              icon={FiLock}
-              type="password"
-              placeholder="Senha"
-            />
-            <Button type="submit">Entrar</Button>
-            <Link to="/forgot-password">Esqueci minha senha.</Link>
+            <Button type="submit">Recuperar</Button>
           </Form>
 
-          <Link to="signup">
+          <Link to="/">
             <FiLogIn size={16} />
-            Criar uma nova conta
+            Voltar ao login
           </Link>
         </AnimationContainer>
       </Content>
@@ -98,4 +85,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default ForgotPassword;
