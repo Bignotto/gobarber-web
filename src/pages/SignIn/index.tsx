@@ -25,7 +25,7 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { user, signIn } = useAuth();
-  const { removeToast, addToast } = useToast();
+  const { addToast } = useToast();
   const history = useHistory();
 
   console.log(user);
