@@ -1,5 +1,4 @@
-import React, { useCallback } from "react";
-import { FiAlertCircle, FiXCircle } from "react-icons/fi";
+import React from "react";
 import { ToastMessage } from "../../hooks/toast";
 import { Container } from "./styles";
 import Toast from "./Toast";

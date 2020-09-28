@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { FiLock } from "react-icons/fi";
 import { Container, Content, Background, AnimationContainer } from "./styles";
 

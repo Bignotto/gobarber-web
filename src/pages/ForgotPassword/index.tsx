@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { FiLogIn, FiMail } from "react-icons/fi";
 import { Container, Content, Background, AnimationContainer } from "./styles";
 
 import { Form } from "@unform/web";
@@ -24,8 +24,7 @@ const ForgotPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const formRef = useRef<FormHandles>(null);
 
-  const { removeToast, addToast } = useToast();
-  const history = useHistory();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (data: ForgotPasswordFormData) => {
