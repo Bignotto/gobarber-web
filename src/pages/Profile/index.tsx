@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { ChangeEvent, useCallback, useRef } from "react";
 import { Form } from "@unform/web";
 import { FormHandles } from "@unform/core";
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from "react-icons/fi";
@@ -17,7 +17,9 @@ import { Container, Content, AvatarInput } from "./styles";
 interface ProfileFormData {
   name: string;
   email: string;
+  old_passwrod: string;
   passwrod: string;
+  passwrod_confirmation: string;
 }
 
 const Profile: React.FC = () => {
@@ -26,32 +28,79 @@ const Profile: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+
+  const handleAvatarChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        const data = new FormData();
+
+        data.append("avatar", e.target.files[0]);
+
+        api.patch("/users/avatar", data).then(response => {
+          updateUser(response.data);
+          addToast({
+            type: "success",
+            title: "Avatar atualizado",
+          });
+        });
+      }
+    },
+    [addToast, updateUser]
+  );
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
       try {
+        formRef.current?.setErrors({});
+
         const schema = Yup.object().shape({
           name: Yup.string().required("Nome é obrigatório!"),
           email: Yup.string()
             .required("E-Mail é obrigatório!")
             .email("Informe um e-mail válido."),
-          password: Yup.string().min(6, "Senha precisa ter 6 dígitos."),
+          old_password: Yup.string(),
+          password: Yup.string().when("old_password", {
+            is: val => !!val.length,
+            then: Yup.string().required("Campo obrigatório!"),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when("old_password", {
+              is: val => !!val.length,
+              then: Yup.string().required("Campo obrigatório!"),
+              otherwise: Yup.string(),
+            })
+            .oneOf([Yup.ref("password")], "Senhas não batem!"),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await api.post("/users", data);
+        const formData = Object.assign(
+          {
+            name: data.name,
+            email: data.email,
+          },
+          data.old_passwrod
+            ? {
+                old_password: data.old_passwrod,
+                password: data.passwrod,
+                password_confirmation: data.passwrod_confirmation,
+              }
+            : {}
+        );
+
+        const response = await api.put("/profile", formData);
+        updateUser(response.data);
+        history.push("/");
 
         addToast({
           type: "success",
-          title: "Cadastro realizado!",
-          description: "Você já pode fazer login!",
+          title: "Atualização bem sucedida!",
+          description: "Seus dados já foram atualizados!",
         });
-
-        history.push("/");
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -61,12 +110,12 @@ const Profile: React.FC = () => {
         //disparar toast
         addToast({
           type: "error",
-          title: "Erro no cadastro.",
+          title: "Erro na atualização.",
           description: "Verifique seus dados e tente novamente.",
         });
       }
     },
-    [addToast, history]
+    [addToast, history, updateUser]
   );
 
   return (
@@ -89,9 +138,10 @@ const Profile: React.FC = () => {
         >
           <AvatarInput>
             <img src={user.avatar_url} alt={user.name} />
-            <Button>
+            <label htmlFor="avatar">
               <FiCamera />
-            </Button>
+              <input type="file" id="avatar" onChange={handleAvatarChange} />
+            </label>
           </AvatarInput>
 
           <h1>Meu perfil</h1>
